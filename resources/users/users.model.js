@@ -20,6 +20,9 @@ const UserSchema = Schema({
         maxlength: 50,
         unique: true,
       },
+      isAdmin:{
+        type:Boolean
+      },
       password: {
         type: String,
         required: true,

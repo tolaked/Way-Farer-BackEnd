@@ -16,6 +16,8 @@ module.exports = {
         .max(50)
         .required()
         .email(),
+        isAdmin: Joi.string().
+        default("false"),
       password: Joi.string()
         .min(5)
         .max(50)
@@ -37,5 +39,6 @@ module.exports = {
         .required(),
     };
     return Joi.validate(user, schema);
-  }
+  },
+  
 };

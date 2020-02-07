@@ -12,9 +12,9 @@ const Auth = {
     },
 
     generateToken(user){
-        // console.log('see',user)
         const payload = {
-            id: user._id
+            id: user._id,
+            isAdmin:user.isAdmin
         }
 
         const options = {
@@ -22,7 +22,6 @@ const Auth = {
         }
 
         const token = jwt.sign(payload, process.env.SECRET_KEY, options)
-        console.log(payload)
         return token
     }
 }
