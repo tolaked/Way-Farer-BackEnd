@@ -8,17 +8,17 @@ const register = async (req,res) =>{
     try{
     const { error } = validation.validateUser(req.body)
     if(error){
-        res.status(422).json({
+        return res.status(422).json({
             status:422,
             error:error.details[0].message
         })
     }
 
-    const { first_name, last_name, email, password } = req.body
+    const { first_name, last_name, email, isAdmin, password } = req.body
     let doc = await Users.findOne({email})
 
     if(doc){
-        res.status(409).json({
+        return res.status(409).json({
             status:409,
             message:'email already exists'
         })
@@ -31,6 +31,7 @@ const register = async (req,res) =>{
         first_name,
         last_name,
         email,
+        isAdmin,
         password:hash
     })
     await doc.save();
@@ -55,7 +56,7 @@ const login = async (req,res) => {
     try{
         const {error} =validation.validateLogin(req.body)
         if(error){
-            res.status(422).json({
+            return res.status(422).json({
                 status:422,
                 error:error.details[0].message
             })
@@ -64,14 +65,14 @@ const login = async (req,res) => {
 
             const existingUser = await Users.findOne({email})
             if(!existingUser){
-                res.status(400).json({
+               return res.status(400).json({
                     status:400,
                     message:'Invalid email or password'
                 })
             }
             const userPassword = await bcrypt.compareSync(password,existingUser.password)
             if(!userPassword){
-                res.status(400).json({
+               return res.status(400).json({
                     message:'invalid email or password'
                 })
             }
