@@ -39,7 +39,25 @@ const addBus = async (req,res) =>{
             error:error.message || 'Something went wrong'
         }
         )}
-
 }
 
-module.exports = { addBus }
+const getAllBuses = (req,res) =>{
+    try{
+     Bus.find(({}, (err, buses) => {
+        if(buses.length === 0) {
+            return res.status(404).json({
+                message:'no bus found'
+            })
+        }
+        return res.status(200).json({message:`${buses.length} bus(es) found`,
+        buses});
+      }))
+    }
+    catch(error){
+        return res.status(500).json({
+
+        })
+    }
+}
+
+module.exports = { addBus,getAllBuses }
