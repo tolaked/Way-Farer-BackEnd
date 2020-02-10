@@ -5,7 +5,7 @@ const router = express.Router();
 
 const { addBus, getAllBuses } = require('./busController');
 
-router.post('/addbus', addBus);
+router.post('/addbus', verifyToken, addBus);
 router.get('/', verifyToken, getAllBuses);
 
 module.exports = router;
