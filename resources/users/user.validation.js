@@ -3,11 +3,11 @@ const Joi = require("joi");
 module.exports = {
   validateUser(user) {
     const schema = {
-      first_name: Joi.string()
+      firstName: Joi.string()
         .min(2)
         .max(50)
         .required(),
-      last_name: Joi.string()
+      lastName: Joi.string()
         .min(2)
         .max(50)
         .required(),
@@ -16,8 +16,8 @@ module.exports = {
         .max(50)
         .required()
         .email(),
-        isAdmin: Joi.string().
-        default("false"),
+      isAdmin: Joi.string()
+        .default("false"),
       password: Joi.string()
         .min(5)
         .max(50)
@@ -40,5 +40,5 @@ module.exports = {
     };
     return Joi.validate(user, schema);
   },
-  
+
 };

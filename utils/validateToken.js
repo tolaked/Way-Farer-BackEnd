@@ -14,7 +14,6 @@ const verifyToken = (req, res, next) => {
         });
       } 
         req.decodedToken = decodedToken;
-        
         if(!decodedToken.isAdmin){
             return res.status(403).json({
                 message:'admin only route'
@@ -25,8 +24,9 @@ const verifyToken = (req, res, next) => {
 
 }
 catch(error){
+
     return res.status(500).json({
-        error:'Something went wrong'
+        error:error ||'see Something went wrong'
     })
 }
 };
