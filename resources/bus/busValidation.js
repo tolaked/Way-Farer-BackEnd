@@ -16,9 +16,9 @@ module.exports = { validateBus(bus) {
       .max(4)
       .required(),
 
-    numberPlate: Joi.string()
+    plateNumber: Joi.string()
       .min(5)
-      .max(10)
+      .max(50)
       .required(),
 
     capacity: Joi.number()

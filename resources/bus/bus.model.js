@@ -3,18 +3,17 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const BusSchema = Schema({
-  numberPlate: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 10,
-    unique: true,
-  },
   manufacturer: {
     type: String,
     required: true,
     minlength: 2,
     maxlength: 15,
+  },
+  plateNumber: {
+    type: String,
+    required: true,
+    minlength: 5,
+    maxlength: 50,
   },
   model: {
     type: String,

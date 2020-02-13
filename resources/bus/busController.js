@@ -9,9 +9,9 @@ const addBus = async (req, res) => {
         message: error.details[0].message,
       });
     }
-    const { numberPlate, year, manufacturer, model, capacity } = req.body;
+    const { plateNumber, year, manufacturer, model, capacity } = req.body;
 
-    let doc = await Bus.findOne({ numberPlate });
+    let doc = await Bus.findOne({ plateNumber });
     if (doc) {
       return res.status(409).json({
         message: 'Bus already exists',
@@ -19,7 +19,7 @@ const addBus = async (req, res) => {
     }
 
     doc = new Bus({
-      numberPlate,
+      plateNumber,
       year,
       manufacturer,
       model,
@@ -34,7 +34,7 @@ const addBus = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      error: error.message || 'Something went wrong',
+      error: `see ${error.message}` || 'Something went wrong',
     });
   }
 };
