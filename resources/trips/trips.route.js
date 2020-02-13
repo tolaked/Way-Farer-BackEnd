@@ -3,9 +3,8 @@ const { verifyToken } = require('../../utils/validateToken');
 
 const router = express.Router();
 
-const { addBus, getAllBuses } = require('./busController');
+const { createTrip } = require('./trips');
 
-router.post('/addbus', verifyToken, addBus);
-router.get('/', verifyToken, getAllBuses);
+router.post('/create', verifyToken, createTrip);
 
 module.exports = router;
