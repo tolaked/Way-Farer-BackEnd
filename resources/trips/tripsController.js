@@ -4,7 +4,7 @@ const Bus = require('../bus/bus.model');
 const createTrip = async (req, res) => {
   const { busId, origin, destination, tripDate, fare, status } = req.body;
   try {
-    const bus = await Bus.findOne({ busId });
+    const bus = await Bus.findOne({ _id: busId });
 
     if (!bus) {
       return res.status(404).json({
@@ -28,7 +28,6 @@ const createTrip = async (req, res) => {
       fare,
       status,
     });
-
     await doc.save();
     return res.status(201).json({
       message: 'Trip created successfully',
@@ -41,4 +40,22 @@ const createTrip = async (req, res) => {
   }
 };
 
-module.exports = { createTrip };
+const getAllTrips = (req, res) => {
+  try {
+    Trip.find(({}, (err, trips) => {
+      if (trips.length === 0) {
+        return res.status(404).json({
+          message: 'no bus found',
+        });
+      }
+      return res.status(200).json({ message: `${trips.length} trip(s) found`,
+        trips });
+    }));
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message || 'Something went wrong',
+    });
+  }
+};
+
+module.exports = { createTrip, getAllTrips };
