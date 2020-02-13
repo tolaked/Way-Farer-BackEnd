@@ -34,7 +34,7 @@ const tripSchema = Schema({
     maxlength: 50,
   },
   status: {
-    type: Number,
+    type: String,
     required: true,
     default: 'active',
   },
