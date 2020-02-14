@@ -1,9 +1,18 @@
 const Trip = require('./trips.model');
 const Bus = require('../bus/bus.model');
+const validation = require('./trips.validation');
 
 const createTrip = async (req, res) => {
-  const { busId, origin, destination, tripDate, fare, status } = req.body;
   try {
+    const { busId, origin, destination, fare, tripDate, status } = req.body;
+
+    const { error } = validation.validateBus(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: error.details[0].message,
+      });
+    }
+
     const bus = await Bus.findOne({ _id: busId });
 
     if (!bus) {
@@ -33,9 +42,9 @@ const createTrip = async (req, res) => {
       message: 'Trip created successfully',
       tripDetails: doc,
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
-      error: 'Something went wrong',
+      err,
     });
   }
 };
