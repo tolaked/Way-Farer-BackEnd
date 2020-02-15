@@ -1,9 +1,18 @@
 const Trip = require('./trips.model');
 const Bus = require('../bus/bus.model');
+const validation = require('./trips.validation');
 
 const createTrip = async (req, res) => {
-  const { busId, origin, destination, tripDate, fare, status } = req.body;
   try {
+    const { busId, origin, destination, fare, tripDate, status } = req.body;
+
+    const { error } = validation.validateBus(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: error.details[0].message,
+      });
+    }
+
     const bus = await Bus.findOne({ _id: busId });
 
     if (!bus) {
@@ -33,9 +42,9 @@ const createTrip = async (req, res) => {
       message: 'Trip created successfully',
       tripDetails: doc,
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
-      error: 'Something went wrong',
+      err,
     });
   }
 };
@@ -58,4 +67,35 @@ const getAllTrips = (req, res) => {
   }
 };
 
-module.exports = { createTrip, getAllTrips };
+// eslint-disable-next-line consistent-return
+const updateTrip = async (req, res) => {
+  const updateparamters = req.body;
+  const { _id } = req.params;
+  try {
+    const trip = await Trip.find({ _id });
+    if (!trip) {
+      return res.status(404).json({
+        message: 'Trip not found',
+      });
+    }
+    if (trip && (trip.status === 'cancelled')) {
+      return res.status(409).json({
+        message: 'This trip is not active',
+      });
+    }
+
+    const updatedTrip = await Trip.update({ _id },
+      { $set: updateparamters });
+    if (updatedTrip) {
+      return res.status(200).json({
+        message: 'Trip updated successfully',
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message || 'Something went wrong',
+    });
+  }
+};
+
+module.exports = { createTrip, getAllTrips, updateTrip };

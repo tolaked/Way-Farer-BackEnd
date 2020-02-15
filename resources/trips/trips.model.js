@@ -30,12 +30,15 @@ const tripSchema = Schema({
   fare: {
     type: Number,
     required: true,
-    minlength: 5,
+    minlength: 3,
     maxlength: 50,
+  },
+  bookings: {
+    type: Number,
+    default: 0,
   },
   status: {
     type: String,
-    required: true,
     default: 'active',
   },
 });
