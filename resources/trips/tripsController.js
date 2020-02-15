@@ -1,6 +1,8 @@
+/* eslint-disable consistent-return */
 const Trip = require('./trips.model');
 const Bus = require('../bus/bus.model');
 const validation = require('./trips.validation');
+const generateSeats = require('../../utils/generateSeats');
 
 const createTrip = async (req, res) => {
   try {
@@ -21,6 +23,9 @@ const createTrip = async (req, res) => {
       });
     }
 
+    const seat = bus.capacity;
+    const seats = generateSeats(seat);
+
     let doc = await Trip.findOne({ busId });
 
     if (doc && (doc.tripDate === tripDate)) {
@@ -36,6 +41,7 @@ const createTrip = async (req, res) => {
       tripDate,
       fare,
       status,
+      seats,
     });
     await doc.save();
     return res.status(201).json({
@@ -44,7 +50,7 @@ const createTrip = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({
-      err,
+      message: err,
     });
   }
 };
@@ -57,6 +63,7 @@ const getAllTrips = (req, res) => {
           message: 'no bus found',
         });
       }
+
       return res.status(200).json({ message: `${trips.length} trip(s) found`,
         trips });
     }));

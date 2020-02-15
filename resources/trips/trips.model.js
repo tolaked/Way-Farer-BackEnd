@@ -12,13 +12,13 @@ const tripSchema = Schema({
   origin: {
     type: String,
     required: true,
-    minlength: 5,
+    minlength: 2,
     maxlength: 50,
   },
   destination: {
     type: String,
     required: true,
-    minlength: 5,
+    minlength: 2,
     maxlength: 50,
   },
   tripDate: {
@@ -36,6 +36,9 @@ const tripSchema = Schema({
   bookings: {
     type: Number,
     default: 0,
+  },
+  seats: {
+    type: [Number],
   },
   status: {
     type: String,
