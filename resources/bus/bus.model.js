@@ -12,6 +12,7 @@ const BusSchema = Schema({
   plateNumber: {
     type: String,
     required: true,
+    unique: true,
     minlength: 5,
     maxlength: 50,
   },
