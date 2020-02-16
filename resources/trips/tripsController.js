@@ -7,7 +7,6 @@ const generateSeats = require('../../utils/generateSeats');
 const createTrip = async (req, res) => {
   try {
     const { busId, origin, destination, fare, tripDate, status } = req.body;
-
     const { error } = validation.validateBus(req.body);
     if (error) {
       return res.status(400).json({
@@ -24,7 +23,7 @@ const createTrip = async (req, res) => {
     }
 
     const seat = bus.capacity;
-    const seats = generateSeats(seat);
+    const availableSeats = generateSeats(seat);
 
     let doc = await Trip.findOne({ busId });
 
@@ -41,7 +40,7 @@ const createTrip = async (req, res) => {
       tripDate,
       fare,
       status,
-      seats,
+      availableSeats,
     });
     await doc.save();
     return res.status(201).json({
