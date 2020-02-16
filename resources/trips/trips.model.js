@@ -37,7 +37,7 @@ const tripSchema = Schema({
     type: Number,
     default: 0,
   },
-  seats: {
+  availableSeats: {
     type: [Number],
   },
   status: {

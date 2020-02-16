@@ -15,6 +15,10 @@ const BookingSchema = Schema({
     minlength: 5,
     maxlength: 50,
   },
+  allocatedSeat: {
+    type: Number,
+    required: true,
+  },
 });
 
 const BookingModel = mongoose.model('Booking', BookingSchema);
