@@ -1,11 +1,12 @@
 const express = require('express');
 
-const { verifyToken } = require('../../utils/validateToken');
-const { bookSeat, getAllBookings } = require('./booking.controller');
+const { verifyToken, verifyAdminToken } = require('../../utils/validateToken');
+const { bookSeat, getAllBookings, getUserBookings } = require('./booking.controller');
 
 const router = express.Router();
 
 router.post('/create/:tripId', verifyToken, bookSeat);
-router.get('/', verifyToken, getAllBookings);
+router.get('/', verifyToken, verifyAdminToken, getAllBookings);
+router.get('/mybookings', verifyToken, getUserBookings);
 
 module.exports = router;
