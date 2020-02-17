@@ -49,4 +49,23 @@ const bookSeat = async (req, res) => {
   }
 };
 
-module.exports = { bookSeat };
+const getAllBookings = (req, res) => {
+  try {
+    Booking.find(({}, (err, bookings) => {
+      if (bookings.length === 0) {
+        return res.status(404).json({
+          message: 'no bookings found',
+        });
+      }
+
+      return res.status(200).json({ message: `${bookings.length} booking(s) found`,
+        bookings });
+    }));
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message || 'Something went wrong',
+    });
+  }
+};
+
+module.exports = { bookSeat, getAllBookings };
