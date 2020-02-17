@@ -1,11 +1,11 @@
 const express = require('express');
-const { verifyToken } = require('../../utils/validateToken');
+const { verifyToken, verifyAdminToken } = require('../../utils/validateToken');
 
 const router = express.Router();
 
 const { addBus, getAllBuses } = require('./busController');
 
-router.post('/addbus', verifyToken, addBus);
+router.post('/addbus', verifyAdminToken, addBus);
 router.get('/', verifyToken, getAllBuses);
 
 module.exports = router;
