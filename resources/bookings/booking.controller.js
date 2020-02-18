@@ -20,8 +20,10 @@ const bookSeat = async (req, res) => {
     }
     const allSeats = trip.availableSeats;
     const allocatedSeat = allSeats[0];
+    const { tripDate } = trip;
+    const { busId } = trip;
     const booking = new Booking({
-      tripId, userId, allocatedSeat,
+      tripId, userId, allocatedSeat, tripDate, busId,
     });
 
     const newbooking = trip.bookings + 1;
@@ -51,7 +53,7 @@ const bookSeat = async (req, res) => {
 
 const getAllBookings = (req, res) => {
   try {
-    Booking.find(({}, (err, bookings) => {
+    Booking.find({}, (err, bookings) => {
       if (bookings.length === 0) {
         return res.status(404).json({
           message: 'no bookings found',
@@ -60,7 +62,7 @@ const getAllBookings = (req, res) => {
 
       return res.status(200).json({ message: `${bookings.length} booking(s) found`,
         bookings });
-    }));
+    });
   } catch (error) {
     return res.status(500).json({
       error: error.message || 'Something went wrong',
@@ -93,4 +95,41 @@ const getUserBookings = (req, res) => {
   }
 };
 
-module.exports = { bookSeat, getAllBookings, getUserBookings };
+const deleteBooking = (req, res) => {
+  const { _id } = req.params;
+  const { id } = req.decodedToken;
+  try {
+    Booking.findOne({ _id }, (err, booking) => {
+      if (err) {
+        return res.status(500).json({
+          message: err,
+        });
+      }
+      if (!booking) {
+        return res.status(500).json({
+          message: 'booking not found',
+        });
+      }
+      if (booking.userId !== id) {
+        return res.status(403).json({
+          message: 'Sorry, you cant delete this booking',
+        });
+      }
+      Booking.deleteOne({ _id }, (error) => {
+        if (error) {
+          return res.status(500).json({
+            message: error,
+          });
+        }
+      });
+      return res.status(200).json({
+        message: 'Booking deleted successfully',
+      });
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error,
+    });
+  }
+};
+module.exports = { bookSeat, getAllBookings, getUserBookings, deleteBooking };
