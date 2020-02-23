@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const mongoose = require("mongoose");
 
-const connectionUrl = require("../config/dbConfig");
+const { connectionUrl } = require("../config/dbConfig");
 
 // this line fixes this warning:
 // (node: 18804) DeprecationWarning: collection.ensureIndex is deprecated.Use createIndexes instead.
