@@ -2,23 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const expressMiddlewares = require('./utils/middlewares');
 const connectDB = require('./database');
-const resources = require('./resources')
-const app = express()
+const resources = require('./resources');
 
-expressMiddlewares(app)
-app.use(resources)
+const app = express();
 
-connectDB()
+expressMiddlewares(app);
+app.use(resources);
 
-app.get('/', (req,res,next)=>{
-    try{
-        res.status(200).json({
-            message:'welcome to wayFarer App'
-        })
-    }
-    catch(error){
-        next(new Error(error));
-    }
-})
+connectDB();
+
+app.get('/', (req, res, next) => {
+  try {
+    res.status(200).json({
+      message: 'welcome to wayFarer App',
+    });
+  } catch (error) {
+    next(new Error(error));
+  }
+});
 
 module.exports = app;

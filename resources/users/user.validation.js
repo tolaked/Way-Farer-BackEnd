@@ -8,7 +8,7 @@ module.exports = {
         .max(50)
         .required(),
       lastName: Joi.string()
-        .min(2)
+        .min(1)
         .max(50)
         .required(),
       email: Joi.string()
@@ -16,7 +16,7 @@ module.exports = {
         .max(50)
         .required()
         .email(),
-      isAdmin: Joi.string()
+      isAdmin: Joi.boolean()
         .default("false"),
       password: Joi.string()
         .min(5)
