@@ -16,14 +16,15 @@ const register = async (req, res) => {
 
 
     const { firstName, lastName, email, isAdmin, password } = req.body;
-    let doc = await Users.findOne({ email });
+    let doc = await Users.findOne({ email }, (err, user)=>{
+      if (err) {
+        return res.status(409).json({
+          status: 409,
+          message: err,
+        });
+      }
+    });
 
-    if (doc) {
-      return res.status(409).json({
-        status: 409,
-        message: 'email already exists',
-      });
-    }
     // Insert a new user
     const salt = genSaltSync(10);
     const hash = hashSync(password, salt);
@@ -45,7 +46,7 @@ const register = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      error: error.message || 'Something went wrong',
+      error,
     });
   }
 };

@@ -8,7 +8,7 @@ module.exports = {
         .max(50)
         .required(),
       lastName: Joi.string()
-        .min(2)
+        .min(1)
         .max(50)
         .required(),
       email: Joi.string()
