@@ -16,7 +16,7 @@ module.exports = {
         .max(50)
         .required()
         .email(),
-      isAdmin: Joi.string()
+      isAdmin: Joi.boolean()
         .default("false"),
       password: Joi.string()
         .min(5)

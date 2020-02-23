@@ -1,7 +1,13 @@
 /* eslint-disable max-len */
 const mongoose = require('mongoose');
+const supertest = require("supertest");
+
+const UserModel = require('../../users/users.model');
 const BusModel = require('../bus.model');
 const { testdburl } = require('../../../config/dbConfig');
+const app = require("../../../app"); // Link to your server file
+
+const request = supertest(app);
 
 const busData = {
   manufacturer: 'Honda',
@@ -12,47 +18,67 @@ const busData = {
 
 };
 
-describe('user model test', () => {
+const invalidbusData = {
+  manufacturer: 'Honda',
+  model: 'civic',
+  year: '2006',
+  capacity: 10,
+
+};
+
+const userData = {
+  firstName: 'Akin',
+  lastName: 'Adeola',
+  email: 'adeola@yahoo.com',
+  isAdmin: true,
+  password: 'Sweetmum',
+
+};
+let token;
+describe('bus model test', () => {
   // connect to the MongoDB Memory Server by using mongoose.connect
   beforeAll(async () => {
     await mongoose.connect(testdburl, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
       if (err) {
-        console.error(err);
         process.exit(1);
       }
     });
   });
 
-  it('create & save a new bus successfully', async () => {
-    const validBus = new BusModel(busData);
-    const savedBus = await validBus.save();
+  it('create & save user successfully', async (done) => {
+    const res = await request.post("/api/v1/users/register").send(userData);
+    token = res.body.user.token;
+    const validUser = await UserModel.findOne({ email: "adeola@yahoo.com" });
+    const savedUser = await validUser.save();
     // Object Id should be defined when successfully saved to MongoDB.
-    expect(savedBus._id).toBeDefined();
-    expect(savedBus.plateNumber).toBe(busData.plateNumber);
-    expect(savedBus.manufacturer).toBe(busData.manufacturer);
-    expect(savedBus.year).toBe(busData.year);
+    expect(savedUser._id).toBeDefined();
+    expect(savedUser.firstName).toBe(userData.firstName);
+    expect(savedUser.lastName).toBe(userData.lastName);
+    expect(savedUser.email).toBe(userData.email);
+    expect(res.body.user.email).toBe(savedUser.email);
+    expect(res.body.user.id).toBe(savedUser._id.toString());
+    done();
   });
 
-  it('create & save user successfully', async () => {
-    const validBus = new BusModel(busData);
-    const savedBus = await validBus.save();
-    expect(savedBus._id).toBeDefined();
-    expect(savedBus.plateNumber).toBe(busData.plateNumber);
-    expect(savedBus.manufacturer).toBe(busData.manufacturer);
-    expect(savedBus.year).toBe(busData.year);
-    expect(savedBus.nickname).toBeUndefined();
+  it('create & save a new bus successfully', async (done) => {
+    const res = await request.post("/api/v1/buses/addbus")
+      .send(busData)
+      .set('authorization', token);
+    const validBus = await BusModel.findOne({ plateNumber: busData.plateNumber });
+    expect(res.body).toBeDefined();
+    expect(res.body.bus.plateNumber).toBe(validBus.plateNumber);
+    expect(res.body.bus.manufacturer).toBe(validBus.manufacturer);
+    expect(res.body.bus.year).toBe(validBus.year);
+
+    done();
   });
-  it('create user without required field should failed', async () => {
-    const userWithoutRequiredField = new BusModel({ manufacturer: 'TekLoon' });
-    let err;
-    try {
-      const savedUserWithoutRequiredField = await userWithoutRequiredField.save();
-      err = savedUserWithoutRequiredField;
-    } catch (error) {
-      err = error;
-    }
-    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
-    expect(err.errors.plateNumber).toBeDefined();
+
+  it('should throw an error if required fields are not filled', async () => {
+    const res = await request.post("/api/v1/buses/addbus")
+      .send(invalidbusData)
+      .set('authorization', token);
+    expect(res.body).toBeDefined();
+    expect(res.body.message).toBe('"plateNumber" is required');
   });
 });
 
@@ -65,6 +91,6 @@ async function removeAllCollections() {
   }
 }
 
-afterEach(async () => {
+afterAll(async () => {
   await removeAllCollections();
 });
