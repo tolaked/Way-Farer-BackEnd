@@ -1,30 +1,17 @@
-/* eslint-disable max-len */
 const mongoose = require('mongoose');
-const supertest = require("supertest");
+const supertest = require('supertest');
 
-const UserModel = require('../../users/users.model');
-const BusModel = require('../bus.model');
+const TripModel = require('../trips.model');
 const { testdburl } = require('../../../config/dbConfig');
-const app = require("../../../app"); // Link to your server file
+const app = require("../../../app");
+const UserModel = require('../../users/users.model');
+const BusModel = require('../../bus/bus.model');
 
 const request = supertest(app);
 
-const busData = {
-  manufacturer: 'Honda',
-  plateNumber: '500-BQ-FKJ',
-  model: 'civic',
-  year: '2006',
-  capacity: 10,
-
-};
-
-const invalidbusData = {
-  manufacturer: 'Honda',
-  model: 'civic',
-  year: '2006',
-  capacity: 10,
-
-};
+let token;
+let busId;
+let tripId;
 
 const userData = {
   firstName: 'Akin',
@@ -34,8 +21,17 @@ const userData = {
   password: 'Sweetmum',
 
 };
-let token;
-describe('bus model test', () => {
+
+const busData = {
+  manufacturer: 'Honda',
+  plateNumber: '500-BQ-FKJ',
+  model: 'civic',
+  year: '2006',
+  capacity: 10,
+};
+
+
+describe('user model test', () => {
   // connect to the MongoDB Memory Server by using mongoose.connect
   beforeAll(async () => {
     await mongoose.connect(testdburl, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
@@ -44,7 +40,6 @@ describe('bus model test', () => {
       }
     });
   });
-
   it('create & save user successfully', async (done) => {
     const res = await request.post("/api/v1/users/register").send(userData);
     token = res.body.user.token;
@@ -64,6 +59,7 @@ describe('bus model test', () => {
     const res = await request.post("/api/v1/buses/addbus")
       .send(busData)
       .set('authorization', token);
+    busId = res.body.bus._id.toString();
     const validBus = await BusModel.findOne({ plateNumber: busData.plateNumber });
     expect(res.body).toBeDefined();
     expect(res.body.bus.plateNumber).toBe(validBus.plateNumber);
@@ -73,32 +69,40 @@ describe('bus model test', () => {
     done();
   });
 
-  it('should throw an error if required fields are not filled', async () => {
-    const res = await request.post("/api/v1/buses/addbus")
-      .send(invalidbusData)
+  it('create & save a trip successfully', async (done) => {
+    const res = await request.post("/api/v1/trips/create").send({
+      busId,
+      origin: 'Oyo',
+      destination: 'Abuja',
+      tripDate: '02-04-2020',
+      fare: 5000 })
       .set('authorization', token);
+    const validTrip = await TripModel.findOne({ busId });
+    const savedTrip = await validTrip.save();
+    tripId = savedTrip._id.toString();
     expect(res.body).toBeDefined();
-    expect(res.body.message).toBe('"plateNumber" is required');
-  });
-  it('get all buses successfully', async (done) => {
-    const res = await request.get("/api/v1/buses")
-      .set('authorization', token);
-    expect(res.body).toBeDefined();
-    expect(res.body.buses.length).toBeGreaterThan(0);
-
+    expect(savedTrip).toBeDefined();
+    expect(res.body.tripDetails.bookings).toBe(savedTrip.bookings);
     done();
+  });
+
+  it('should successfully update a trip', async () => {
+    const res = await request.patch(`/api/v1/trips/${tripId}`)
+      .send({ origin: 'Ogun' })
+      .set('authorization', token);
+    expect(res.body).toBeDefined();
+    expect(res.body.message).toBe('Trip updated successfully');
   });
 });
 
 
 async function removeAllCollections() {
   const collections = Object.keys(mongoose.connection.collections);
-  for (const collectionName of collections) {
-    const collection = mongoose.connection.collections[collectionName];
+  for (const wayfarer_test of collections) {
+    const collection = mongoose.connection.collections[wayfarer_test];
     await collection.deleteMany();
   }
 }
-
 afterAll(async () => {
   await removeAllCollections();
 });
