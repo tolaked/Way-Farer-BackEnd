@@ -40,25 +40,28 @@ describe('user model test', () => {
     done();
   });
 
-  it('should throw an error', async () => {
-    const validUser = new UserModel({ firstName: 'Tola',
-      lastName: 'Akere',
-      email: 'tola@gmail.com',
-      password: 'Sweetmum' });
-    const savedUser = await validUser.save();
-    expect(savedUser.nickname).toBeUndefined();
+  it('should throw an error if user already exists', async () => {
+    const res = await request.post("/api/v1/users/register")
+      .send({ firstName: 'Tola',
+        lastName: 'Akere',
+        email: 'tolay@gmail.com',
+        password: 'Sweetmum' });
+    expect(res.body).toBeDefined();
+    expect(res.body.status).toBe(500);
+    expect(res.body.error.name).toBe('MongoError');
   });
   it('create user without required field should fail', async () => {
-    const userWithoutRequiredField = new UserModel({ firstName: 'TekLoon' });
     let err;
     try {
-      const savedUserWithoutRequiredField = await userWithoutRequiredField.save();
-      err = savedUserWithoutRequiredField;
+      const userWithoutRequiredField = await request.post("/api/v1/users/register")
+        .send({ firstName: 'TekLoon' });
+      err = userWithoutRequiredField;
     } catch (error) {
       err = error;
     }
-    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
-    expect(err.errors.lastName).toBeDefined();
+    expect(err.body).toBeDefined();
+    expect(err.body.status).toBe(422);
+    expect(err.body.error).toBe('"lastName" is required');
   });
   it('create user with existing email', async () => {
     const userWithoutRequiredField = new UserModel(userData);
